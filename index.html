@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 30px;
+            position: relative;
+        }
+
+        body {
+            background-image:  url("https://www.shutterstock.com/image-vector/food-kitchen-seamless-pattern-pale-600nw-276735071.jpg");
+        }
+        #form{
+            margin-bottom: 50px;
+        }
+
+        .image {
+            position: relative;
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            opacity: 0;
+            transition: .5s ease;
+            background-color: #008CBA;
+        }
+
+        .image:hover .overlay {
+            opacity: 1;
+        }
+
+        .text {
+            color: white;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+     <form class="d-flex" id="form">
+        <input id="searched" class="form-control me-2" type="search" placeholder="Search for the meal" aria-label="Search">
+        <button class="btn btn-success" type="submit">Search</button>
+      </form>
+      <ul id="results" class="list-group mt-3"></ul>
+      <div class="container-anchor">
+          <a href="favourite.html" id="favur">
+             <div class="image">
+                 <img id="favur1" src="https://as1.ftcdn.net/v2/jpg/03/11/60/32/1000_F_311603279_Sj4PNByTG7tHw1J2koJxGcrc8V3l9rtS.jpg" height="500px" width="100%" alt="favourites" title="favourites">
+                 <div class="overlay">
+                     <div class="text">favourites click here..</div>
+                 </div>
+             </div>
+         </a>
+      </div>
+      
+    </div>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded',function()
+        {
+            const searched=document.getElementById('searched');
+            const result=document.getElementById('result');
+            const form=document.getElementById('form');
+            form.addEventListener('submit',function(event){
+                event.preventDefault();
+                searchhappen();
+            });
+            searched.addEventListener('input',function(){
+                searchhappen();
+            });
+            function searchhappen(){
+                const query=searched.value.trim();
+                if(query.length>0){
+                    fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`)
+                    .then(response=>response.json())
+                    .then(data=>{
+                        results.innerHTML='';
+                        if(data.meals){
+                            data.meals.forEach(meal=>{
+                                const li=document.createElement('li');
+                                li.className='list-group-item';
+                                li.innerHTML=`
+                                <span>${meal.strMeal}</span>
+                                <button class="btn btn-secondary btn-sm float-right" onclick="addToFavourites(${meal.idMeal})">Favourite</button></button>
+                                <a href="meal.html?id=${meal.idMeal}"class="btn btn-info btn-sm float-right mr-2">View</a>
+                                `;
+                                results.appendChild(li);
+                            });
+                        }
+                        else{
+                            results.innerHTML=`<li class='list-group-item'>NO-LIST-FOUND</li>`
+                        }
+
+                    });
+                }
+                else 
+                {
+                    results.innerHTML = '';
+                 }
+            }
+        });
+        function addToFavourites(mealId) {
+            let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+            if (!favourites.includes(mealId)) {
+                favourites.push(mealId);
+                localStorage.setItem('favourites', JSON.stringify(favourites));
+            }
+        }
+    </script>
+</body>
+</html>

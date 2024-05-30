@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favourite Meals</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        #ready{
+            display: flex;
+            justify-content: center;
+            margin-top:200px;
+
+        }
+         body{
+            background-image: url("https://www.shutterstock.com/image-vector/food-kitchen-seamless-pattern-pale-600nw-276735071.jpg");
+        }
+        h1{
+            text-align: center;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Favourite Meals</h1>
+        <ul id="favourites" class="list-group mt-3"></ul>
+        <a href="index.html" class="btn btn-success mt-3" id="ready">Back to Home</a>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+    const favouritesList = document.getElementById('favourites');
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+
+    if (favourites.length > 0) {
+        favourites.forEach(mealId => {
+            fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.meals && data.meals.length > 0) {
+                        const meal = data.meals[0];
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.innerHTML = `
+                            <span>${meal.strMeal}</span>
+                            <button class="btn btn-danger btn-sm float-right" onclick="removeFromFavourites(${meal.idMeal})">Remove</button>
+                            <a href="meal.html?id=${meal.idMeal}" class="btn btn-info btn-sm float-right mr-2">View</a>
+                        `;
+                        favouritesList.appendChild(li);
+                    }
+                });
+        });
+    } else {
+        favouritesList.innerHTML = '<li class="list-group-item">No favourite meals</li>';
+    }
+});
+
+function removeFromFavourites(mealId) {
+    let favourites = JSON.parse(localStorage.getItem('favourites')) || [];
+    favourites = favourites.filter(id => id !== mealId);
+    localStorage.setItem('favourites', JSON.stringify(favourites));
+    location.reload();
+}
+
+    </script>
+</body>
+</html>

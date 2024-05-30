@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        #backbtn{
+            display: flex;
+            justify-content: center;
+        }
+        body{
+            background-image: url("https://www.shutterstock.com/image-vector/food-kitchen-seamless-pattern-pale-600nw-276735071.jpg");
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mealsDet" class="mt-3"></div>
+        <a  id="backbtn"href="index.html" class="btn btn-success mt-3">Back to Home</a>
+    </div>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded',function(){
+            const urlparms=new URLSearchParams(window.location.search);
+            const mid=urlparms.get('id');
+            const mealsDet=document.getElementById('mealsDet');
+            if(mid){
+                fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mid}`)
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.meals &&data.meals.length>0){
+                        const meal=data.meals[0];
+                        mealsDet.innerHTML = `
+                        <h2 style="text-align:center; color:red; text-transform: uppercase; font-family:sans-serif;">${meal.strMeal}</h2>
+                        <img src="${meal.strMealThumb}" class="img-fluid" style="display: block; margin: 0 auto; " width=100% height=100%>
+                        <h4 style="margin-top:20px; text-align:center;">Instructions</h4>
+                        <p>${meal.strInstructions}</p>
+                        <h4 style="margin-top:20px; text-align:center;">Ingredients</h4>
+                        <ul> ${getIngredients(meal).map(ing=>`<li>${ing}</li>`).join('')}</ul>`;
+                    
+                    }
+                });
+            }
+            function getIngredients(meal){
+                let ingred=[];
+                for(let i=1;i<=20;i++){
+                    if(meal[`strIngredient${i}`]){
+                        ingred.push(`${meal[`strIngredient${i}`]} - ${meal[`strMeasure${i}`]}`);
+                    } 
+                    else 
+                    {
+                        break;
+                    }
+                    
+                }
+                return ingred;
+            }
+
+        });
+        
+
+    </script>
+</body>
+</html>
